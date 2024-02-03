@@ -1,0 +1,122 @@
+Les commandes de base
+
+les modes de configurations:
+switch>enable           mode utilisateur
+switch#                 mode privéligie
+  show .....   : afficher une configuration
+  copy  running-config    startup-config : Enregistrer la configuration
+  reload      : redemarrer le switch
+  configure terminal : entrer au mode de config global
+switch(config)#             mode de configuration global
+Switch(config-if)#          mode de configuration d'interface
+switch(config-line)#        mode de configuration de lignes
+switch(config-router)#      mode de configuration de routage
+exit : pour sortir du mode actuel 
+end  : n'imprte qu'il mode vers le mode privéligié
+---------------------------------------------------------
+
+show running-config : afficher la configuration en cours
+--------------------------------------------------------------
+les commande de base
+- Nom : Hostname SW1
+- bannière du jours : banner motd # message #
+- mots de passe du mode privéligie :
+   * clair : enable password pass@123
+   * crypté : enable secret pass@123
+- désactiver la recherche dns
+   * no ip domain-lookup
+-desactive service http
+   *no ip http server
+- Enregistrer la configuration 
+   * copy running-config stratup-config
+   * Write 
+- configuration de switch:
+   * En local : la ligne console
+                line console 0
+                password pass@123
+                login
+   * distance : les lignes VTY 
+                line vty 0 15
+                password pass@123
+                login
+
+- crypter tous les mots de passe en clair
+  * service password-encryption
+-----------------------------------------------------------------
+configuration des lignes VTY ( a distance )
+ - Avec telnet
+    Etape 1 : Affecter une adresse IP au switch
+               interface vlan 1
+               ip address 192.168.1.100 255.255.255.0
+               no shutdown
+    Etape 2 : Configuration de VTY
+              line vty 0 15
+              password vty@123
+              login
+    Etape 3 : tester l'acces a partir de PC
+              CMD => telnet  192.168.1.100
+
+NB : telnet n'est pas sécurisé (communication en clair), il est remplacé avec ssh
+
+- Avec SSH
+    Etape 1 : Affecter une adresse IP au switch
+               interface vlan 1
+               ip address 192.168.1.100 255.255.255.0
+               no shutdown
+    Etape 2 : Nom de switch
+              hostname SW1
+    Etape 3 : Nom de domaine
+              ip domain-name cisco.ma
+    Etape 4 : Compte utilisateur
+              username admin password ssh@123
+    Etape 5 : Creation des clés de chiffrement
+              crypto key generate rsa
+              <longueur clés: 512, 1024, 2048..>
+    Etape 6 : Activation de SSH dans les vty
+              line vty 0 15
+              transport input {ssh|telnet|all|none}
+              login local
+    ETape 7 : tester l'acces SSH a partir du pc
+              CMD => ssh -l admin 192.168.1.100
+-----------------------------------------------
+----------------------------------------------
+configuration des vlans :
+Etape 1 : creation des vlans
+      (config)# vlan 10
+                name etud
+Etape 2 : affectation des ports aux vlans
+      (config)# interface range f0/x-x
+                switchport mode access  (access : pc => switch)
+                switchport access vlan 10
+Etape 3 : configuration de trunk et vlan de Gestion et natif
+    (config)# interface fx/x
+              switchport mode trunk  (trunk : switch => swictch)
+              switchport trunk native vlan 99
+              switchport trunk allowed vlan 10,20,99 (facultatif)
+Commandes de verifications 
+show vlan brief
+show interface f0/1 switchport
+
+
+
+---------------------------Configure le switch en mode PAgP-----------------------------------------
+
+Switch(config)#Interface range fx/x-x
+Switch(config-if-range)#switchport mode trunk
+Swtich(config-if-range)#channel-group 1 ou 2 mode (desribale) ou (Auto)
+
+
+
+---------------------------Configure le switch en mode LACP-----------------------------------------
+
+Switch(config)#Interface range fx/x-x
+Switch(config-if-range)#switchport mode trunk
+Swtich(config-if-range)#channel-group 2 ou 1 mode (Active) ou (Passive)
+
+
+
+-------------------------Verification de EtherChannel--------------------------------------------
+
+Switch#Show etherchannel summary
+Switch#Show etherchannel port-channel
+Switch#Show interfaces etherchannel

@@ -1,0 +1,115 @@
+Réglez l’horloge :
+S1# clock set 15:00:00 31 Jan 2035
+Attribuez un nom au commutateur :
+Switch# configure terminal
+Switch(config)# hostname S1
+ Sécurisez l’accès à la ligne de console :
+S1(config)# line console 0
+S1(config-line)# password letmein
+S1(config-line)# login
+Sécurisez l’accès au mode privilégié.
+S1#configure terminal
+S1(config)# enable password c1$c0
+Configurez un mot de passe chiffré pour sécuriser l’accès au mode privilégié.
+S1# config t
+S1(config)# enable secret itsasecret
+Chiffrez les mots de passe d’activation (enable) et de console.
+S1# config t
+S1(config)# service password-encryption
+Configurer une bannière MOTD
+S1# config t
+S1(config)# banner motd "This is a secure system. Authorized Access Only!"
+ Enregistrer les fichiers de configuration dans la mémoire NVRAM :
+S1# copy running-config startup-config
+Configurez S1 avec une adresse IP :
+S1(config)# interface vlan 1
+S1(config-if)# ip address 192.168.1.253 255.255.255.0
+S1(config-if)# no shutdown
+Empêchez les recherches DNS indésirables :
+S1(config)# no ip domain-lookup
+Affichez le statut des interfaces connectées sur le commutateur :
+S1# show ip interface brief
+Tracer le chemin entre la source et la destination
+C:\> tracert www.hawaii.edu
+contenu de la table de routage :
+R1# show ip route
+préparer l’adressage et activer l’interface
+R1(config)# interface gigabitethernet 0/0
+R1(config-if)# ip address 192.168.10.1 255.255.255.0
+R1(config-if)# no shutdown
+Configurez une description d’interface :
+R1(config-if)# description LAN connection to S1
+
+
+ Une configuration de passerelle par défaut :
+S1(config)# ip default-gateway 192.168.10.1
+affecter le modèle dual-ipv4-and-ipv6 comme modèle par défaut SDM :
+S1# configure terminal
+S1(config)# sdm prefer dual-ipv4-and-ipv6 default
+S1(config)# end
+S1# reload
+Configurez et activez les interfaces sur le routeur :
+R1(config)# interface g0/0/0
+R1(config-if)# ip address 192.168.0.1 255.255.255.0
+R1(config-if)# ipv6 address 2001:db8:acad::1/64
+R1(config-if)# no shutdown
+activer le routage IPv6:
+R1(config)# ipv6 unicast-routing
+Configurez l’adresse IPv6 link-local :
+R1(config-if)# ipv6 address fe80::1 link-local
+connexion SSH à un serveur distant :
+C:\> ssh -l admin 64.100.0.1
+Fixez la longueur minimale du mot de passe à 10 :
+RTA(config)# security password min-length 10
+Réglez le nom de domaine :
+RTA(config)# ip domain-name CCNA.com
+
+
+Créez un utilisateur de votre choix avec un mot de passe
+RTA (config) # username jony secret itexamanswers.net
+Générez des clés RSA de 1 024 bits :
+RTA(config)# crypto key generate rsa
+Le nom des clés sera : RTA.CCNA.com
+Choose the size of the key modulus in the range of 360 to 2048 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  quelques minutes.
+
+How many bits in the modulus [512]: 1024
+ Bloquez pendant trois minutes quiconque n’arrive pas à se connecter au bout de quatre tentatives en deux minutes :
+RTA(config)# login block-for 180 attempts 4 within 120
+Configurez toutes les lignes VTY pour l’accès SSH et utilisez les profils d’utilisateurs locaux pour l’authentification :
+RTA(config)# line vty 0 4
+RTA(config-line)# transport input ssh
+RTA(config-line)# login local
+Réglez le délai d’expiration du mode EXEC sur 6 minutes sur les lignes VTY.
+RTA(config-line)# exec-timeout 6
+Cette commande définit la vitesse de transmission et configure le mode duplex de l'interface :
+interface FastEthernet0/5
+speed 100
+duplex full
+Les utilisateurs doivent être déconnectés après 5 minutes d’inactivité :
+R1(config-line)#exec-timeout 5 0
+ Configurez les interfaces en tant que ports d’accès :
+S2(config)# interface f0/11
+S2(config-if)# switchport mode access
+S2(config-if)# switchport access vlan 10
+Configurez les interfaces G0/1 et G0/2 sur S1 pour le système de trunk.
+S1(config)# interface range g0/1 - 2
+S1(config-if)# switchport mode trunk
+Configurez le VLAN 99 en tant que VLAN natif pour les interfaces G0/1 et G0/2 sur S1.
+S1(config-if)# switchport trunk native vlan 99
+Configurez F0/1 sur S1 pour négocier le mode trunk :
+S1(config)# interface f0/1
+S1(config-if)# switchport mode dynamic desirable
+ configurez l’interface GigabitEthernet 0/2 comme une liaison trunk statique sur S1. De plus, désactivez la négociation DTP sur l’interface G0/2 sur S1 :
+S1(config)# interface g0/2
+S1(config-if)# switchport mode trunk
+S1(config-if)# switchport nonegotiate
+
+
+
+
+Configurez des sous-interfaces sur R1 en utilisant l’encapsulation 802.1Q :
+R1(config)# int g0/0,10
+R1(config-subif)# encapsulation dot1Q 10
+R1(config-subif)# ip address 172.17.10.1 255.255.255.0
